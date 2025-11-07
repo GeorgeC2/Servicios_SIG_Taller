@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.24.0
+    container_name: geoserver
+    ports:
+      - "8080:8080"
+    environment:
+      - GEOSERVER_ADMIN_USER=admin
+      - GEOSERVER_ADMIN_PASSWORD=geoserver
+      - GEOSERVER_DATA_DIR=/opt/geoserver_data
+      - INITIAL_MEMORY=2G
+      - MAXIMUM_MEMORY=4G
+    volumes:
+      - geoserver_data:/opt/geoserver_data
+      - ./data:/data/shapefiles
+    restart: unless-stopped
+
+volumes:
+  geoserver_data:
+    driver: local
