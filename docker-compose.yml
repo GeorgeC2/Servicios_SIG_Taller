@@ -1,6 +1,28 @@
 version: '3.8'
 
 services:
+  postgis:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgis
+    container_name: postgis
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=geodatos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data/geopackage:/geopackage
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   geoserver:
     image: docker.osgeo.org/geoserver:2.24.0
     container_name: geoserver
@@ -15,8 +37,13 @@ services:
     volumes:
       - geoserver_data:/opt/geoserver_data
       - ./data:/data/shapefiles
+    depends_on:
+      postgis:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
   geoserver_data:
+    driver: local
+  postgres_data:
     driver: local
