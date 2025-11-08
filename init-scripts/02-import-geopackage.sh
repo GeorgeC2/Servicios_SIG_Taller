@@ -4,7 +4,8 @@ set -e
 echo "Esperando a que PostGIS esté completamente listo..."
 sleep 5
 
-GEOPACKAGE_FILE="/geopackage/amazonas.gpkg"
+# Usar el GeoPackage de Chocó
+GEOPACKAGE_FILE="/geopackage/choco.gpkg"
 
 if [ ! -f "$GEOPACKAGE_FILE" ]; then
     echo "ERROR: No se encontró el archivo GeoPackage en $GEOPACKAGE_FILE"
@@ -22,7 +23,7 @@ echo "Listando las capas disponibles en el GeoPackage..."
 ogrinfo "$GEOPACKAGE_FILE"
 
 # Definir las capas a importar
-LAYERS=("dpto_amazonas" "puntos_administrativos")
+LAYERS=("dpto_choco" "puntos_administrativos")
 
 # Importar cada capa a su propia tabla
 # Durante la inicialización, usamos la conexión por socket Unix (sin host)
@@ -52,7 +53,7 @@ echo "Verificando las tablas importadas..."
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     \dt
 
-    SELECT 'dpto_amazonas' as tabla, COUNT(*) as total_registros FROM dpto_amazonas
+    SELECT 'dpto_choco' as tabla, COUNT(*) as total_registros FROM dpto_choco
     UNION ALL
     SELECT 'puntos_administrativos' as tabla, COUNT(*) as total_registros FROM puntos_administrativos;
 EOSQL
